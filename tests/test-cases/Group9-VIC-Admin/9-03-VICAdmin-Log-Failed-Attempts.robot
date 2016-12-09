@@ -22,7 +22,7 @@ Verify Failed Log Attempts
     Cleanup VIC Appliance On Test Server
     
     #Install a second appliance
-    Install VIC Appliance To Test Server
+    Install VIC Appliance To Test Server  snapshot=${false}
     OperatingSystem.File Should Exist  old-certs/cert.pem
     OperatingSystem.File Should Exist  old-certs/key.pem
     ${out}=  Run  wget -v --tries=3 --connect-timeout=10 --certificate=old-certs/cert.pem --private-key=old-certs/key.pem --no-check-certificate %{VIC-ADMIN}/logs/vicadmin.log -O failure.log

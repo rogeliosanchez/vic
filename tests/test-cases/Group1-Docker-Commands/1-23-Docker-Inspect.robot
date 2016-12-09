@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation  Test 1-23 - Docker Inspect
 Resource  ../../resources/Util.robot
-Suite Setup  Install VIC Appliance To Test Server  certs=${false}
+Suite Setup  Install VIC Appliance To Test Server
 Suite Teardown  Cleanup VIC Appliance On Test Server
 
 *** Test Cases ***

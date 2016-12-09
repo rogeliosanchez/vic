@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation  Test 8-01 - Verify VM guest tools integration
 Resource  ../../resources/Util.robot
-Suite Setup  Install VIC Appliance To Test Server  certs=${false}
+Suite Setup  Install VIC Appliance To Test Server
 Suite Teardown  Cleanup VIC Appliance On Test Server
 
 *** Keywords ***

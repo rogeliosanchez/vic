@@ -13,9 +13,9 @@ Extra Cleanup
 
 *** Test Cases ***
 Verify VIC Still Works When Different VM Is Registered
-    Install VIC Appliance To Test Server
+    Install VIC Appliance To Test Server  snapshot=${false}
     Set Suite Variable  ${old-vm}  %{VCH-NAME}
-    Install VIC Appliance To Test Server
+    Install VIC Appliance To Test Server  snapshot=${false}
 
     ${out}=  Run  govc vm.power -off ${old-vm}
     Should Contain  ${out}  OK

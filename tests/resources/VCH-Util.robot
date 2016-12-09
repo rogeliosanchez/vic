@@ -109,24 +109,25 @@ Install VIC Appliance To Test Server
 
     # Install the VCH now
     Log To Console  \nInstalling VCH to test server...
-    Run Keyword If  ${snapshot}  Install VCH With Snapshots  ${vic-machine}  ${appliance-iso}  ${bootstrap-iso}  ${certs}  ${vol}
-    Run Keyword Unless  ${snapshot}  Install VCH Without Snapshots  ${vic-machine}  ${appliance-iso}  ${bootstrap-iso}  ${certs}  ${vol}
+    ${status}=  Run Keyword And Return Status  Environment Variable Should Be Set  BUILD_SERVER
+    Run Keyword If  ${status} & ${snapshot}  Install VCH With Snapshots  ${vic-machine}  ${appliance-iso}  ${bootstrap-iso}  ${certs}  ${vol}
+    Run Keyword Unless  ${status} & ${snapshot}  Install VCH Without Snapshots  ${vic-machine}  ${appliance-iso}  ${bootstrap-iso}  ${certs}  ${vol}
 
 Install VCH With Snapshots
+    [Tags]  secret
     [Arguments]  ${vic-machine}  ${appliance-iso}  ${bootstrap-iso}  ${certs}  ${vol}
-    ${status}=  Run Keyword And Return Status  Environment Variable Should Be Set  SNAPSHOT
-    Run Keyword If  ${status}  Revert Test Server Snapshot  %{VCH-NAME}  %{SNAPSHOT}
-    Run Keyword If  ${status}  Log To Console  Reverted snapshot successfully, ready to start new test...
-    Return From Keyword If  ${status}
+    ${snapshot}=  Run Keyword And Return Status  Environment Variable Should Be Set  SNAPSHOT
+    ${hostname}=  Run Keyword And Return Status  Environment Variable Should Be Set  TEST_HOSTNAME
+    Run Keyword If  ${snapshot} & ${hostname}  Revert Test Server Snapshot  %{TEST_HOSTNAME}  %{SNAPSHOT}
+    Run Keyword If  ${snapshot} & ${hostname}  Log To Console  Reverted snapshot successfully, ready to start new test...
+    Return From Keyword If  ${snapshot} & ${hostname}
     
     ${output}=  Run VIC Machine Command  ${vic-machine}  ${appliance-iso}  ${bootstrap-iso}  ${certs}  ${vol}
     Log  ${output}
     Should Contain  ${output}  Installer completed successfully
     Get Docker Params  ${output}  ${certs}
-    ${status}=  Run Keyword And Return Status  Environment Variable Should Be Set  BUILD_SERVER
-    Run Keyword If  ${status}  Create Test Server Snapshot  ${VCH-NAME}  %{VCH-NAME}-snapshot
-    Run Keyword If  ${status}  Set Environment Variable  SNAPSHOT  %{VCH-NAME}-snapshot
-    Run Keyword If  ${status}  Log To Console  Initial snapshot created: %{VCH-NAME}-snapshot
+    Setup Snapshot
+    Log To Console  Initial snapshot created: %{SNAPSHOT}
     Log To Console  Installer completed successfully: %{VCH-NAME}, initial snapshot created...
 
 Install VCH Without Snapshots

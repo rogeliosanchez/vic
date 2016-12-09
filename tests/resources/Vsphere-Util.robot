@@ -99,6 +99,7 @@ Get VM Info
     [Return]  ${out}
 
 Create Test Server Snapshot
+    [Tags]  secret
     [Arguments]  ${vm}  ${snapshot}
     Set Environment Variable  GOVC_URL  %{BUILD_SERVER}
     ${rc}  ${out}=  Run And Return Rc And Output  govc snapshot.create -vm ${vm} ${snapshot}
@@ -107,6 +108,7 @@ Create Test Server Snapshot
     Set Environment Variable  GOVC_URL  %{TEST_USERNAME}:%{TEST_PASSWORD}@%{TEST_URL}
 
 Revert Test Server Snapshot
+    [Tags]  secret
     [Arguments]  ${vm}  ${snapshot}
     Set Environment Variable  GOVC_URL  %{BUILD_SERVER}
     ${rc}  ${out}=  Run And Return Rc And Output  govc snapshot.revert -vm ${vm} ${snapshot}
@@ -115,6 +117,7 @@ Revert Test Server Snapshot
     Set Environment Variable  GOVC_URL  %{TEST_USERNAME}:%{TEST_PASSWORD}@%{TEST_URL}
 
 Delete Test Server Snapshot
+    [Tags]  secret
     [Arguments]  ${vm}  ${snapshot}
     Set Environment Variable  GOVC_URL  %{BUILD_SERVER}
     ${rc}  ${out}=  Run And Return Rc And Output  govc snapshot.remove -vm ${vm} ${snapshot}
@@ -123,6 +126,7 @@ Delete Test Server Snapshot
     Set Environment Variable  GOVC_URL  %{TEST_USERNAME}:%{TEST_PASSWORD}@%{TEST_URL}
 
 Setup Snapshot
+    [Tags]  secret
     ${hostname}=  Get Test Server Hostname
     Set Environment Variable  TEST_HOSTNAME  ${hostname}
     Set Environment Variable  SNAPSHOT  vic-ci-test-%{DRONE_BUILD_NUMBER}
