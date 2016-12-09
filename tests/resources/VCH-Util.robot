@@ -1,5 +1,6 @@
 *** Settings ***
 Documentation  This resource contains all keywords related to creating, deleting, maintaining VCHs
+Resource  Util.robot
 
 *** Keywords ***
 Set Test Environment Variables
@@ -96,7 +97,7 @@ Get Docker Params
     Run Keyword If  ${port} == 2375  Set Environment Variable  VCH-PARAMS  -H ${dockerHost}
 
 Install VIC Appliance To Test Server
-    [Arguments]  ${vic-machine}=bin/vic-machine-linux  ${appliance-iso}=bin/appliance.iso  ${bootstrap-iso}=bin/bootstrap.iso  ${certs}=${true}  ${vol}=default
+    [Arguments]  ${vic-machine}=bin/vic-machine-linux  ${appliance-iso}=bin/appliance.iso  ${bootstrap-iso}=bin/bootstrap.iso  ${certs}=${true}  ${vol}=default  ${snapshot}=${false}
     Set Test Environment Variables
     # disable firewall
     Run Keyword If  '%{HOST_TYPE}' == 'ESXi'  Run  govc host.esxcli network firewall set -e false
@@ -108,6 +109,28 @@ Install VIC Appliance To Test Server
 
     # Install the VCH now
     Log To Console  \nInstalling VCH to test server...
+    Run Keyword If  ${snapshot}  Install VCH With Snapshots  ${vic-machine}  ${appliance-iso}  ${bootstrap-iso}  ${certs}  ${vol}
+    Run Keyword Unless  ${snapshot}  Install VCH Without Snapshots  ${vic-machine}  ${appliance-iso}  ${bootstrap-iso}  ${certs}  ${vol}
+
+Install VCH With Snapshots
+    [Arguments]  ${vic-machine}  ${appliance-iso}  ${bootstrap-iso}  ${certs}  ${vol}
+    ${status}=  Run Keyword And Return Status  Environment Variable Should Be Set  SNAPSHOT
+    Run Keyword If  ${status}  Revert Test Server Snapshot  %{VCH-NAME}  %{SNAPSHOT}
+    Run Keyword If  ${status}  Log To Console  Reverted snapshot successfully, ready to start new test...
+    Return From Keyword If  ${status}
+    
+    ${output}=  Run VIC Machine Command  ${vic-machine}  ${appliance-iso}  ${bootstrap-iso}  ${certs}  ${vol}
+    Log  ${output}
+    Should Contain  ${output}  Installer completed successfully
+    Get Docker Params  ${output}  ${certs}
+    ${status}=  Run Keyword And Return Status  Environment Variable Should Be Set  BUILD_SERVER
+    Run Keyword If  ${status}  Create Test Server Snapshot  ${VCH-NAME}  %{VCH-NAME}-snapshot
+    Run Keyword If  ${status}  Set Environment Variable  SNAPSHOT  %{VCH-NAME}-snapshot
+    Run Keyword If  ${status}  Log To Console  Initial snapshot created: %{VCH-NAME}-snapshot
+    Log To Console  Installer completed successfully: %{VCH-NAME}, initial snapshot created...
+
+Install VCH Without Snapshots
+    [Arguments]  ${vic-machine}  ${appliance-iso}  ${bootstrap-iso}  ${certs}  ${vol}
     ${output}=  Run VIC Machine Command  ${vic-machine}  ${appliance-iso}  ${bootstrap-iso}  ${certs}  ${vol}
     Log  ${output}
     Should Contain  ${output}  Installer completed successfully
