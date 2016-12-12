@@ -98,8 +98,8 @@ Get Docker Params
 
 Install VIC Appliance To Test Server
     [Arguments]  ${vic-machine}=bin/vic-machine-linux  ${appliance-iso}=bin/appliance.iso  ${bootstrap-iso}=bin/bootstrap.iso  ${certs}=${true}  ${vol}=default  ${snapshot}=${true}
-    ${status}=  Run Keyword And Return Status  Environment Variable Should Be Set  BUILD_SERVER
-    Run Keyword Unless  ${status} & ${snapshot}  Set Test Environment Variables
+    ${status}=  Run Keyword And Return Status  Environment Variable Should Be Set  SNAPSHOT
+    Run Keyword If  (${status} == ${false}) | (${snapshot} == ${false})  Set Test Environment Variables
     # disable firewall
     Run Keyword If  '%{HOST_TYPE}' == 'ESXi'  Run  govc host.esxcli network firewall set -e false
     # Attempt to cleanup old/canceled tests
@@ -110,6 +110,7 @@ Install VIC Appliance To Test Server
 
     # Install the VCH now
     Log To Console  \nInstalling VCH to test server...
+    ${status}=  Run Keyword And Return Status  Environment Variable Should Be Set  BUILD_SERVER
     Run Keyword If  ${status} & ${snapshot}  Install VCH With Snapshots  ${vic-machine}  ${appliance-iso}  ${bootstrap-iso}  ${certs}  ${vol}
     Run Keyword Unless  ${status} & ${snapshot}  Install VCH Without Snapshots  ${vic-machine}  ${appliance-iso}  ${bootstrap-iso}  ${certs}  ${vol}
 
