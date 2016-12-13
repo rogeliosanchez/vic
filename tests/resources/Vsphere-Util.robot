@@ -102,28 +102,40 @@ Create Test Server Snapshot
     [Tags]  secret
     [Arguments]  ${vm}  ${snapshot}
     Set Environment Variable  GOVC_URL  %{BUILD_SERVER}
+    Set Environment Variable  GOVC_USERNAME  %{BUILD_USERNAME}
+    Set Environment Variable  GOVC_PASSWORD  %{BUILD_PASSWORD}
     ${rc}  ${out}=  Run And Return Rc And Output  govc snapshot.create -vm ${vm} ${snapshot}
     Should Be Equal As Integers  ${rc}  0
     Should Be Empty  ${out}
     Set Environment Variable  GOVC_URL  %{TEST_USERNAME}:%{TEST_PASSWORD}@%{TEST_URL}
+    Remove Environment Variable  GOVC_USERNAME
+    Remove Environment Variable  GOVC_PASSWORD
 
 Revert Test Server Snapshot
     [Tags]  secret
     [Arguments]  ${vm}  ${snapshot}
     Set Environment Variable  GOVC_URL  %{BUILD_SERVER}
+    Set Environment Variable  GOVC_USERNAME  %{BUILD_USERNAME}
+    Set Environment Variable  GOVC_PASSWORD  %{BUILD_PASSWORD}
     ${rc}  ${out}=  Run And Return Rc And Output  govc snapshot.revert -vm ${vm} ${snapshot}
     Should Be Equal As Integers  ${rc}  0
     Should Be Empty  ${out}
     Set Environment Variable  GOVC_URL  %{TEST_USERNAME}:%{TEST_PASSWORD}@%{TEST_URL}
+    Remove Environment Variable  GOVC_USERNAME
+    Remove Environment Variable  GOVC_PASSWORD
 
 Delete Test Server Snapshot
     [Tags]  secret
     [Arguments]  ${vm}  ${snapshot}
     Set Environment Variable  GOVC_URL  %{BUILD_SERVER}
+    Set Environment Variable  GOVC_USERNAME  %{BUILD_USERNAME}
+    Set Environment Variable  GOVC_PASSWORD  %{BUILD_PASSWORD}
     ${rc}  ${out}=  Run And Return Rc And Output  govc snapshot.remove -vm ${vm} ${snapshot}
     Should Be Equal As Integers  ${rc}  0
     Should Be Empty  ${out}
     Set Environment Variable  GOVC_URL  %{TEST_USERNAME}:%{TEST_PASSWORD}@%{TEST_URL}
+    Remove Environment Variable  GOVC_USERNAME
+    Remove Environment Variable  GOVC_PASSWORD
 
 Setup Snapshot
     [Tags]  secret
@@ -140,7 +152,10 @@ Get Datacenter Name
 
 Get Test Server Hostname
     [Tags]  secret
-    ${hostname}=  Run  sshpass -p $TEST_PASSWORD ssh $TEST_USERNAME@$TEST_URL hostname
+    Open Connection  %{TEST_URL}  prompt=:~]
+    Login  %{TEST_USERNAME}  %{TEST_PASSWORD}
+    ${hostname}=  Execute Command  hostname
+    Close connection
     [Return]  ${hostname}
 
 Check Delete Success
